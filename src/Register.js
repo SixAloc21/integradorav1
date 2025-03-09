@@ -13,7 +13,6 @@ const Register = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // Validaciones previas
         if (!name.trim() || !email.trim() || !password.trim() || !confirmPassword.trim()) {
             setError('Por favor, completa todos los campos.');
             return;
@@ -24,7 +23,7 @@ const Register = () => {
         }
 
         try {
-            const response = await axios.post('http://localhost:5000/register', {
+            const response = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/register`, {
                 nombre: name.trim(),
                 correo: email.trim(),
                 contrasena: password.trim(),
@@ -101,61 +100,3 @@ const Register = () => {
 };
 
 export default Register;
-
-// 🎨 Estilos
-const styles = {
-  container: {
-    backgroundColor: '#00BDD4',
-    minHeight: '100vh',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: '20px',
-    color: '#fff',
-  },
-  title: {
-    fontSize: '28px',
-    fontWeight: 'bold',
-    marginBottom: '20px',
-  },
-  error: {
-    color: '#f44336',
-    marginBottom: '15px',
-  },
-  form: {
-    backgroundColor: '#DBFFD6',
-    padding: '30px',
-    borderRadius: '10px',
-    width: '100%',
-    maxWidth: '400px',
-    boxShadow: '0 4px 10px rgba(0, 0, 0, 0.2)',
-  },
-  inputGroup: {
-    marginBottom: '15px',
-  },
-  label: {
-    display: 'block',
-    marginBottom: '5px',
-    fontSize: '14px',
-    fontWeight: 'bold',
-  },
-  input: {
-    width: '100%',
-    padding: '10px',
-    fontSize: '16px',
-    border: '1px solid #ccc',
-    borderRadius: '4px',
-  },
-  button: {
-    width: '100%',
-    padding: '10px',
-    backgroundColor: '#007bff',
-    color: '#fff',
-    border: 'none',
-    borderRadius: '4px',
-    cursor: 'pointer',
-    fontSize: '16px',
-    transition: 'background-color 0.3s ease',
-  },
-};
