@@ -1,0 +1,57 @@
+.auth-container {
+    width: 400px;
+    margin: auto;
+    position: relative;
+    overflow: hidden;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    background-color: #e3f2fd;
+    padding: 20px;
+  }
+  
+  .form-box {
+    display: flex;
+    width: 200%;
+    transition: transform 0.5s ease-in-out;
+  }
+  
+  .form {
+    width: 50%;
+    padding: 20px;
+    background: #fff;
+    text-align: center;
+  }
+  
+  .input {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+  
+  .button {
+    width: 100%;
+    padding: 10px;
+    background-color: #00bdd4;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .toggle-text {
+    margin-top: 10px;
+  }
+  
+  .toggle-link {
+    color: #007bff;
+    cursor: pointer;
+    font-weight: bold;
+  }
+  
+  .error {
+    color: #f44336;
+    margin-bottom: 10px;
+  }
+  
