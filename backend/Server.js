@@ -7,10 +7,11 @@ const util = require('util');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// 🔹 **Configuración de CORS** para permitir solicitudes desde el frontend en Vercel
+// 🔹 **Configuración de CORS** (Permitir solicitudes desde el frontend en Vercel)
 const corsOptions = {
-    origin: ["https://tu-backend.vercel.app"], // 🔹 Cambia esto por la URL de tu frontend en Vercel
+    origin: ["https://integradorav1.vercel.app"], // 🔹 Cambia esto por la URL de tu frontend en Vercel
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+    allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
 };
 app.use(cors(corsOptions));
@@ -18,18 +19,18 @@ app.use(express.json());
 
 // 🔹 **Configuración de la base de datos**
 const db = mysql.createConnection({
-    host: process.env.DB_HOST || "localhost",
-    user: process.env.DB_USERNAME || "root",
-    password: process.env.DB_PASSWORD || "",
-    database: process.env.DB_DATABASE || "test",
-    port: process.env.DB_PORT || 3306,
+    host: process.env.DB_HOST,
+    user: process.env.DB_USERNAME,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_DATABASE,
+    port: process.env.DB_PORT,
     multipleStatements: true
 });
 
-// 🔹 Convertir `db.query` a Promesas
+// 🔹 Convertir `db.query` a Promesas para facilitar el uso con async/await
 db.query = util.promisify(db.query);
 
-// 🔹 **Conectar a MySQL**
+// 🔹 **Conectar a MySQL con reconexión automática**
 const connectToDatabase = () => {
     db.connect((err) => {
         if (err) {
@@ -52,10 +53,23 @@ const connectToDatabase = () => {
 
 connectToDatabase(); // 🔹 Iniciar conexión
 
-// 🔹 **Ruta de prueba de conexión**
+// 🔹 **Middleware de CORS (Alternativo, en caso de que el anterior no funcione)**
+app.use((req, res, next) => {
+    res.header("Access-Control-Allow-Origin", "*"); // ⚠️ Puedes cambiarlo por la URL de tu frontend
+    res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
+    
+    if (req.method === "OPTIONS") {
+        return res.status(200).end();
+    }
+
+    next();
+});
+
+// 🔹 **Ruta de prueba para verificar la conexión**
 app.get("/", async (req, res) => {
     try {
-        const result = await db.query("SELECT 1 + 1 AS result"); // Prueba de consulta
+        const result = await db.query("SELECT 1 + 1 AS result"); // Prueba de consulta a MySQL
         res.json({ message: "🚀 Servidor corriendo y conectado a MySQL", result });
     } catch (error) {
         console.error("🚨 Error en la consulta:", error);
