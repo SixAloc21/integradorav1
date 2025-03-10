@@ -9,7 +9,7 @@ const PORT = process.env.PORT || 5000;
 
 // 🔹 **Configuración de CORS** para permitir solicitudes desde el frontend en Vercel
 const corsOptions = {
-    origin: ["https://tu-backend.vercel.app/"], // 🔹 Cambia esto por la URL de tu frontend en Vercel
+    origin: ["https://tu-backend.vercel.app"], // 🔹 Cambia esto por la URL de tu frontend en Vercel
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
     credentials: true,
 };
