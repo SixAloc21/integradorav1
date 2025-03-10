@@ -9,7 +9,7 @@ const PORT = process.env.PORT || 5000;
 
 // 🔹 **Configuración de CORS** (Permitir solicitudes desde el frontend en Vercel)
 const corsOptions = {
-    origin: ["https://integradorav1.vercel.app"], // 🔹 Cambia esto por la URL de tu frontend en Vercel
+    origin: ["https://tu-backend.vercel.app"], // 🔹 Cambia esto por la URL de tu frontend en Vercel
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
