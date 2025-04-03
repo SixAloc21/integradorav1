@@ -1,43 +1,108 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { CartContext } from "./CartContext";
-import Header from "./Header"; // Se mantiene la navegación
+import Header from "./Header";
+import axios from "axios";
 
 const NuestroProducto = () => {
   const { addToCart } = useContext(CartContext);
+  const [producto, setProducto] = useState(null);
+  const [monto, setMonto] = useState("");
+  const usuario = JSON.parse(localStorage.getItem("usuario"));
 
-  const product = {
-    name: "Silla de Ruedas Inteligente",
-    price: 599.99,
-    image: "/imagenes/silladeruedas.png",
+  useEffect(() => {
+    const fetchProducto = async () => {
+      try {
+        const response = await axios.get("http://localhost:5000/productos");
+        setProducto(response.data[0]);
+      } catch (error) {
+        console.error("Error al obtener producto:", error);
+      }
+    };
+
+    fetchProducto();
+  }, []);
+
+  const handleRecarga = async () => {
+    if (!monto || parseFloat(monto) <= 0) {
+      alert("⚠️ Ingresa un monto válido");
+      return;
+    }
+
+    try {
+      const res = await fetch("http://localhost:5000/recargar", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id_usuario: usuario.id_usuario, monto: parseFloat(monto) }),
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        alert(data.message);
+        setMonto("");
+      } else {
+        alert("❌ Error: " + data.error);
+      }
+    } catch (error) {
+      console.error("❌ Error al recargar:", error);
+      alert("Error al procesar recarga");
+    }
   };
 
   return (
     <div>
-      <Header /> {/* Se mantiene la navegación */}
+      <Header />
 
       <div style={styles.container}>
+        {/* 💳 Recarga de Saldo Flotante */}
+        <div style={styles.recargaBox}>
+          <h4>💰 Recargar Saldo</h4>
+          <input
+            type="number"
+            placeholder="Monto"
+            value={monto}
+            onChange={(e) => setMonto(e.target.value)}
+            style={styles.input}
+          />
+          <button onClick={handleRecarga} style={styles.recargarBtn}>Recargar</button>
+        </div>
+
         <h2 style={styles.title}>Nuestro Producto</h2>
         <p style={styles.description}>
           La <strong>Silla de Ruedas Inteligente Rollase</strong> es un avance revolucionario en movilidad.  
-          Equipada con **sensores de proximidad, detección de obstáculos y frenos automáticos**, esta silla  
+          Equipada con <strong>sensores de proximidad, detección de obstáculos y frenos automáticos</strong>, esta silla  
           permite a los usuarios desplazarse con mayor seguridad y autonomía.  
-          Además, incluye un **sistema de navegación inteligente**, control remoto y modos personalizados  
+          Además, incluye un <strong>sistema de navegación inteligente</strong>, control remoto y modos personalizados  
           para distintas necesidades.
         </p>
 
-        {/* Imagen del producto */}
-        <img 
-          src={product.image} 
-          alt="Silla de Ruedas Inteligente"
-          style={styles.image} 
-        />
+        {producto && (
+          <>
+            <img src={producto.imagen} alt={producto.nombre_producto} style={styles.image} />
 
-        {/* Información de Suscripciones */}
+            <div style={styles.purchaseContainer}>
+              <h3 style={styles.subTitle}>🛒 Comprar la Silla</h3>
+              <p>Adquiere la silla de ruedas inteligente con todas sus características avanzadas.</p>
+              <button 
+                onClick={() => addToCart({
+                  id: producto.id_producto,
+                  name: producto.nombre_producto,
+                  price: parseFloat(producto.precio),
+                  image: producto.imagen,
+                  quantity: 1
+                })}
+                style={styles.cartButton}
+              >
+                🛒 Agregar al Carrito
+              </button>
+            </div>
+          </>
+        )}
+
+        {/* 📦 Suscripciones */}
         <div style={styles.subscriptions}>
           <h3 style={styles.subTitle}>📜 Nuestras Suscripciones</h3>
           <p>Elige un plan para acceder a nuestros servicios exclusivos.</p>
 
-          {/* Plan Básico */}
           <div style={styles.card}>
             <h4>🎟️ Plan Básico</h4>
             <p>Funciones esenciales y soporte técnico básico.</p>
@@ -46,7 +111,6 @@ const NuestroProducto = () => {
             <button style={styles.payButton}>Pagar</button>
           </div>
 
-          {/* Plan Premium */}
           <div style={styles.card}>
             <h4>💎 Plan Premium</h4>
             <p>Funciones avanzadas, soporte técnico prioritario y actualizaciones exclusivas.</p>
@@ -55,30 +119,44 @@ const NuestroProducto = () => {
             <button style={styles.payButton}>Pagar</button>
           </div>
         </div>
-
-        {/* Opción de Compra */}
-        <div style={styles.purchaseContainer}>
-          <h3 style={styles.subTitle}>🛒 Comprar la Silla</h3>
-          <p>Adquiere la silla de ruedas inteligente con todas sus características avanzadas.</p>
-          <button 
-            onClick={() => addToCart(product)}
-            style={styles.cartButton}
-          >
-            🛒 Agregar al Carrito
-          </button>
-        </div>
       </div>
     </div>
   );
 };
 
-// 🎨 **Estilos Restaurados + Ajustes del Carrito**
 const styles = {
   container: {
     padding: "20px",
     textAlign: "center",
-    backgroundColor: "#E3F2FD", 
+    backgroundColor: "#E3F2FD",
     color: "#333",
+    position: "relative"
+  },
+  recargaBox: {
+    position: "absolute",
+    top: "20px",
+    right: "30px",
+    backgroundColor: "#fff",
+    borderRadius: "10px",
+    padding: "15px",
+    width: "220px",
+    boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
+  },
+  input: {
+    padding: "8px",
+    width: "100%",
+    marginBottom: "10px",
+    borderRadius: "5px",
+    border: "1px solid #ccc"
+  },
+  recargarBtn: {
+    backgroundColor: "#00BDD4",
+    color: "#fff",
+    border: "none",
+    padding: "8px",
+    width: "100%",
+    borderRadius: "5px",
+    cursor: "pointer"
   },
   title: {
     fontSize: "28px",

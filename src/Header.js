@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { CartContext } from "./CartContext";
 
@@ -12,6 +12,26 @@ const Header = () => {
     alert("Cerrando sesión...");
     navigate("/");
   };
+
+const usuario = JSON.parse(localStorage.getItem("usuario"));
+const [saldo, setSaldo] = useState(null);
+
+useEffect(() => {
+  const fetchSaldo = async () => {
+    if (!usuario) return;
+    try {
+      const res = await fetch(`http://localhost:5000/saldo/${usuario.id_usuario}`);
+      const data = await res.json();
+      if (res.ok) {
+        setSaldo(data.saldo);
+      }
+    } catch (err) {
+      console.error("❌ Error al obtener saldo:", err);
+    }
+  };
+
+  fetchSaldo();
+}, [usuario]);
 
   return (
     <header style={styles.header}>
@@ -27,7 +47,16 @@ const Header = () => {
             <Link to="/subscriptions " style={styles.navLink}>Suscripciones</Link>
           </li>
           <li style={styles.navItem}>
+          <Link to="/mis-suscripciones" style={styles.navLink}>Mi Suscripción</Link>
+          </li>
+          <li style={styles.navItem}>
+          <Link to="/mis-facturas" style={styles.navLink}>Mis Facturas</Link>
+          </li>
+          <li style={styles.navItem}>
             <Link to="/cart" style={styles.navLink}>🛒 Carrito ({cart.length})</Link>
+          </li>
+          <li style={{ marginRight: "20px", color: "#fff", fontWeight: "bold" }}>
+            🧾 Saldo: ${saldo !== null ? saldo.toFixed(2) : "Cargando..."}
           </li>
         </ul>
         {/* 🔹 Botón de Cerrar Sesión */}

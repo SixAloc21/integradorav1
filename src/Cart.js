@@ -3,34 +3,91 @@ import { CartContext } from "./CartContext";
 import Header from "./Header";
 
 const Cart = () => {
-  const { cart, removeFromCart } = useContext(CartContext);
+  const { cart, removeFromCart, clearCart } = useContext(CartContext);
+
+  const getTotalPrice = () => {
+    return cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
+  };
+
+  const handlePagar = async () => {
+    const token = localStorage.getItem("token");
+    const usuario = JSON.parse(localStorage.getItem("usuario"));
+
+    if (!usuario) return alert("⚠️ Debes iniciar sesión para pagar.");
+
+    try {
+      const response = await fetch("http://localhost:5000/pagar", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          carrito: cart,
+          total: getTotalPrice(),
+          id_usuario: usuario.id_usuario,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        alert("✅ Pago realizado con éxito.");
+        clearCart();
+      } else {
+        alert("❌ Error en el pago: " + data.error);
+      }
+    } catch (err) {
+      console.error("💥 Error:", err);
+      alert("❌ Error al realizar el pago.");
+    }
+  };
 
   return (
     <div>
       <Header />
       <div style={styles.container}>
         <h2 style={styles.title}>🛒 Tu Carrito</h2>
-        
+
         {cart.length === 0 ? (
           <p style={styles.emptyText}>Tu carrito está vacío.</p>
         ) : (
-          <ul style={styles.cartList}>
-            {cart.map((product, index) => (
-              <li key={index} style={styles.cartItem}>
-                <img src={product.image} alt={product.name} style={styles.image} />
-                <div style={styles.details}>
-                  <p style={styles.productName}>{product.name}</p>
-                  <p style={styles.productPrice}>${product.price.toFixed(2)}</p>
-                  <button 
-                    onClick={() => removeFromCart(index)}
-                    style={styles.removeButton}
-                  >
-                    ❌ Eliminar
-                  </button>
-                </div>
-              </li>
-            ))}
-          </ul>
+          <>
+            <ul style={styles.cartList}>
+              {cart.map((product, index) => (
+                <li key={index} style={styles.cartItem}>
+                  <img src={product.image} alt={product.name} style={styles.image} />
+                  <div style={styles.details}>
+                    <p style={styles.productName}>{product.name}</p>
+                    <p style={styles.productPrice}>${product.price.toFixed(2)}</p>
+                    <p style={styles.productPrice}>Cantidad: {product.quantity}</p>
+                    <button onClick={() => removeFromCart(index)} style={styles.removeButton}>
+                      ❌ Eliminar
+                    </button>
+                  </div>
+                </li>
+              ))}
+            </ul>
+
+            <p style={{ fontSize: "18px", marginTop: "10px" }}>
+              <strong>Total:</strong> ${getTotalPrice().toFixed(2)}
+            </p>
+
+            <button
+              onClick={handlePagar}
+              style={{
+                marginTop: "20px",
+                padding: "10px 20px",
+                background: "#28a745",
+                color: "white",
+                border: "none",
+                borderRadius: "5px",
+                cursor: "pointer",
+              }}
+            >
+              💳 Pagar
+            </button>
+          </>
         )}
       </div>
     </div>
@@ -96,3 +153,5 @@ const styles = {
 };
 
 export default Cart;
+
+

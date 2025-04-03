@@ -6,7 +6,11 @@ export const CartProvider = ({ children }) => {
   const [cart, setCart] = useState([]);
 
   const addToCart = (product) => {
-    setCart([...cart, product]);
+    const productWithQuantity = {
+      ...product,
+      quantity: product.quantity || 1
+    };
+    setCart([...cart, productWithQuantity]);
   };
 
   const removeFromCart = (index) => {
@@ -14,8 +18,13 @@ export const CartProvider = ({ children }) => {
     setCart(updatedCart);
   };
 
+  // ✅ Esta función te hacía falta
+  const clearCart = () => {
+    setCart([]);
+  };
+
   return (
-    <CartContext.Provider value={{ cart, addToCart, removeFromCart }}>
+    <CartContext.Provider value={{ cart, addToCart, removeFromCart, clearCart }}>
       {children}
     </CartContext.Provider>
   );

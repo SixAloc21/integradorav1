@@ -1,8 +1,9 @@
 import { initializeApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider } from "firebase/auth";
 import { getAnalytics } from "firebase/analytics";
+import { getFirestore } from "firebase/firestore"; // 👈 agrega esto
 
-// Configuración de Firebase (asegúrate de que las credenciales sean correctas)
+// Configuración de Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyD8Qstfy9I0Wm1TMBd6TECyOREA4V3ABRA",
   authDomain: "rollase-5bd39.firebaseapp.com",
@@ -13,15 +14,17 @@ const firebaseConfig = {
   measurementId: "G-386VQ1HQWM"
 };
 
-// 🟢 Inicializar Firebase
+// Inicializar Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const googleProvider = new GoogleAuthProvider();
 const analytics = typeof window !== "undefined" ? getAnalytics(app) : null;
+const db = getFirestore(app); // 👈 agrega esta línea
 
-// 🔹 Configuración para evitar pop-ups bloqueados
+// Configuración adicional
 googleProvider.setCustomParameters({
   prompt: "select_account",
 });
 
-export { auth, googleProvider, analytics };
+// Exportar todo
+export { auth, googleProvider, analytics, db }; // 👈 aquí agregamos db

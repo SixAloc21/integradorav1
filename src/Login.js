@@ -30,8 +30,9 @@ const Login = () => {
 
       if (response.ok) {
         localStorage.setItem("token", data.token);
+        localStorage.setItem("usuario", JSON.stringify(data.usuario)); // <-- ESTA LÍNEA
         setError("");
-
+      
         // 🔹 Redirigir según el rol
         if (data.usuario.nombre_rol === "Administrador") {
           navigate("/admin");
@@ -68,6 +69,7 @@ const Login = () => {
 
             // Guardar el token en localStorage
             localStorage.setItem("token", response.data.token);
+            localStorage.setItem("usuario", JSON.stringify(response.data.usuario)); // 💥 ESTA LÍNEA
 
             // 🔹 Redirigir según el rol
             if (response.data.usuario.nombre_rol === "Administrador") {
