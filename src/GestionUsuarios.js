@@ -3,6 +3,8 @@ import DashboardLayout from './DashboardLayout';
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 
+const API_URL = process.env.REACT_APP_API_URL;
+
 const GestionUsuarios = () => {
   const [usuarios, setUsuarios] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -11,7 +13,7 @@ const GestionUsuarios = () => {
 
   const fetchUsuarios = async () => {
     try {
-      const response = await fetch('http://localhost:5000/usuarios');
+      const response = await fetch(`${API_URL}/usuarios`);
       const data = await response.json();
       if (response.ok) setUsuarios(data);
     } catch (error) {
@@ -23,7 +25,7 @@ const GestionUsuarios = () => {
 
   const fetchUsuariosActivos = async () => {
     try {
-      const response = await fetch('http://localhost:5000/usuarios-activos');
+      const response = await fetch(`${API_URL}/usuarios-activos`);
       const data = await response.json();
       if (response.ok) setUsuarios(data);
     } catch (error) {
@@ -35,7 +37,7 @@ const GestionUsuarios = () => {
 
   const fetchUltimasSuscripciones = async () => {
     try {
-      const response = await fetch('http://localhost:5000/ultima-suscripcion');
+      const response = await fetch(`${API_URL}/ultima-suscripcion`);
       const data = await response.json();
       if (response.ok) setUsuarios(data);
     } catch (error) {
@@ -47,7 +49,7 @@ const GestionUsuarios = () => {
 
   const toggleEstatus = async (id) => {
     try {
-      const res = await fetch(`http://localhost:5000/usuarios/${id}/toggle`, { method: 'PUT' });
+      const res = await fetch(`${API_URL}/usuarios/${id}/toggle`, { method: 'PUT' });
       const data = await res.json();
       if (res.ok) {
         alert("✅ Estatus actualizado");

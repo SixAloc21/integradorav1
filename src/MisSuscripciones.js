@@ -3,12 +3,12 @@ import Header from "./Header";
 import { db } from "./firebaseConfig";
 import { doc, onSnapshot } from "firebase/firestore";
 
-
+const API_URL = process.env.REACT_APP_API_URL;
 
 const MisSuscripciones = () => {
   const [suscripcion, setSuscripcion] = useState(null);
-  const [facturas, setFacturas] = useState([]); // 🧾 facturas de suscripción
-  const [facturasProducto, setFacturasProducto] = useState([]); // 🧾 facturas de productos
+  const [facturas, setFacturas] = useState([]);
+  const [facturasProducto, setFacturasProducto] = useState([]);
   const [loading, setLoading] = useState(true);
   const usuario = JSON.parse(localStorage.getItem("usuario"));
 
@@ -28,40 +28,39 @@ const MisSuscripciones = () => {
         setLoading(false);
       }
     );
-  
-    // Las otras llamadas se pueden dejar igual:
+
     const fetchFacturas = async () => {
       try {
-        const res = await fetch(`http://localhost:5000/facturas/${usuario.id_usuario}`);
+        const res = await fetch(`${API_URL}/facturas/${usuario.id_usuario}`);
         const data = await res.json();
         if (res.ok) setFacturas(data);
       } catch (err) {
         console.error("❌ Error al obtener facturas:", err);
       }
     };
-  
+
     const fetchFacturasProducto = async () => {
       try {
-        const res = await fetch(`http://localhost:5000/facturas-productos/${usuario.id_usuario}`);
+        const res = await fetch(`${API_URL}/facturas-productos/${usuario.id_usuario}`);
         const data = await res.json();
         if (res.ok) setFacturasProducto(data);
       } catch (err) {
         console.error("❌ Error al obtener facturas de productos:", err);
       }
     };
-  
+
     fetchFacturas();
     fetchFacturasProducto();
-  
-    return () => unsubscribe(); // Limpieza de listener
-  }, [usuario.id_usuario]);  
+
+    return () => unsubscribe();
+  }, [usuario.id_usuario]);
 
   const cancelarSuscripcion = async () => {
     const confirm = window.confirm("¿Estás seguro de que deseas cancelar tu suscripción?");
     if (!confirm) return;
 
     try {
-      const res = await fetch(`http://localhost:5000/cancelar-suscripcion/${usuario.id_usuario}`, {
+      const res = await fetch(`${API_URL}/cancelar-suscripcion/${usuario.id_usuario}`, {
         method: "PUT",
       });
       const data = await res.json();
@@ -99,7 +98,6 @@ const MisSuscripciones = () => {
           <p>No tienes suscripción activa</p>
         )}
 
-        {/* 🧾 Historial de facturas de suscripción */}
         {facturas.length > 0 && (
           <div style={{ marginTop: "40px" }}>
             <h3>🧾 Historial de Facturas de Suscripción</h3>
@@ -113,7 +111,6 @@ const MisSuscripciones = () => {
           </div>
         )}
 
-        {/* 🛒 Facturas de productos */}
         {facturasProducto.length > 0 && (
           <div style={{ marginTop: "40px" }}>
             <h3>🛒 Facturas de Compras</h3>

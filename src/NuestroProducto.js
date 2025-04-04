@@ -3,6 +3,8 @@ import { CartContext } from "./CartContext";
 import Header from "./Header";
 import axios from "axios";
 
+const API_URL = process.env.REACT_APP_API_URL;
+
 const NuestroProducto = () => {
   const { addToCart } = useContext(CartContext);
   const [producto, setProducto] = useState(null);
@@ -12,7 +14,7 @@ const NuestroProducto = () => {
   useEffect(() => {
     const fetchProducto = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/productos");
+        const response = await axios.get(`${API_URL}/productos`);
         setProducto(response.data[0]);
       } catch (error) {
         console.error("Error al obtener producto:", error);
@@ -29,7 +31,7 @@ const NuestroProducto = () => {
     }
 
     try {
-      const res = await fetch("http://localhost:5000/recargar", {
+      const res = await fetch(`${API_URL}/recargar`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id_usuario: usuario.id_usuario, monto: parseFloat(monto) }),

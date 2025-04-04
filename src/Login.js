@@ -4,13 +4,14 @@ import { auth, googleProvider } from "./firebaseConfig";
 import { signInWithPopup } from "firebase/auth";
 import axios from "axios";
 
+const API = process.env.REACT_APP_API_URL;
+
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  // 🔹 Iniciar sesión con Email y Contraseña (API Local)
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -20,7 +21,7 @@ const Login = () => {
     }
 
     try {
-      const response = await fetch("http://127.0.0.1:5000/login", {
+      const response = await fetch(`${API}/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ correo: email.trim(), contrasena: password.trim() }),
@@ -30,10 +31,9 @@ const Login = () => {
 
       if (response.ok) {
         localStorage.setItem("token", data.token);
-        localStorage.setItem("usuario", JSON.stringify(data.usuario)); // <-- ESTA LÍNEA
+        localStorage.setItem("usuario", JSON.stringify(data.usuario));
         setError("");
-      
-        // 🔹 Redirigir según el rol
+
         if (data.usuario.nombre_rol === "Administrador") {
           navigate("/admin");
         } else {
@@ -48,44 +48,33 @@ const Login = () => {
     }
   };
 
-  // 🔹 Iniciar sesión con Google y guardar en base de datos local
   const handleGoogleLogin = async () => {
     try {
-        const result = await signInWithPopup(auth, googleProvider);
-        const user = result.user;
-        console.log("✅ Usuario autenticado con Google:", user);
+      const result = await signInWithPopup(auth, googleProvider);
+      const user = result.user;
 
-        // 🔥 Enviar el correo al backend para guardarlo o iniciar sesión
-        const response = await axios.post("http://localhost:5000/store-user", {
-            correo: user.email,
-            nombre: user.displayName
-        });
+      const response = await axios.post(`${API}/store-user`, {
+        correo: user.email,
+        nombre: user.displayName,
+      });
 
-        console.log("📥 Respuesta del backend:", response.data);
+      if (response.data.token && response.data.usuario) {
+        localStorage.setItem("token", response.data.token);
+        localStorage.setItem("usuario", JSON.stringify(response.data.usuario));
 
-        // 🔥 Verificar que la respuesta contiene `token` y `usuario`
-        if (response.data.token && response.data.usuario) {
-            console.log("✅ Token y usuario recibidos correctamente:", response.data);
-
-            // Guardar el token en localStorage
-            localStorage.setItem("token", response.data.token);
-            localStorage.setItem("usuario", JSON.stringify(response.data.usuario)); // 💥 ESTA LÍNEA
-
-            // 🔹 Redirigir según el rol
-            if (response.data.usuario.nombre_rol === "Administrador") {
-                navigate("/admin");
-            } else {
-                navigate("/home");
-            }
+        if (response.data.usuario.nombre_rol === "Administrador") {
+          navigate("/admin");
         } else {
-            setError("Error al iniciar sesión con Google. Intenta de nuevo.");
-            console.error("🚨 La respuesta del backend no contiene `token` o `usuario`:", response.data);
+          navigate("/home");
         }
+      } else {
+        setError("Error al iniciar sesión con Google. Intenta de nuevo.");
+      }
     } catch (error) {
-        console.error("🚨 Error al iniciar sesión con Google:", error);
-        setError("Error al iniciar sesión con Google.");
+      console.error("🚨 Error al iniciar sesión con Google:", error);
+      setError("Error al iniciar sesión con Google.");
     }
-};
+  };
 
   return (
     <div style={styles.container}>
@@ -125,7 +114,6 @@ const Login = () => {
         <Link to="/register" style={styles.link}>Regístrate aquí</Link>
       </p>
 
-      {/* Botón de inicio de sesión con Google */}
       <button onClick={handleGoogleLogin} style={styles.googleButton}>
         <img 
           src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Google_%22G%22_Logo.svg/512px-Google_%22G%22_Logo.svg.png" 
@@ -140,7 +128,7 @@ const Login = () => {
 
 export default Login;
 
-// 🎨 **Estilos dentro del mismo código**
+// 🎨 Estilos
 const styles = {
   container: {
     background: "linear-gradient(135deg, #00BDD4, #0099CC)",

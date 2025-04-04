@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import "./Auth.css"; // Importamos el CSS externo
+import "./Auth.css";
+
+const API = process.env.REACT_APP_API_URL;
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -41,12 +43,13 @@ const Auth = () => {
 
     try {
       if (isLogin) {
-        const response = await axios.post("http://localhost:5000/login", {
+        const response = await axios.post(`${API}/login`, {
           correo: loginEmail.trim(),
           contrasena: loginPassword.trim(),
         });
 
         localStorage.setItem("token", response.data.token);
+        localStorage.setItem("usuario", JSON.stringify(response.data.usuario));
         alert("Inicio de sesión exitoso");
 
         if (response.data.usuario.nombre_rol === "Administrador") {
@@ -55,7 +58,7 @@ const Auth = () => {
           navigate("/home");
         }
       } else {
-        const response = await axios.post("http://localhost:5000/register", {
+        const response = await axios.post(`${API}/register`, {
           nombre: name.trim(),
           correo: registerEmail.trim(),
           contrasena: registerPassword.trim(),

@@ -3,6 +3,7 @@ import Header from "./Header";
 import { db } from "./firebaseConfig";
 import { doc, setDoc } from "firebase/firestore";
 
+const API_URL = process.env.REACT_APP_API_URL;
 
 const Suscription = () => {
   const token = localStorage.getItem("token");
@@ -19,7 +20,7 @@ const Suscription = () => {
     fecha_vencimiento.setMonth(fecha_vencimiento.getMonth() + 1);
 
     try {
-      const response = await fetch("http://localhost:5000/suscribirse", {
+      const response = await fetch(`${API_URL}/suscribirse`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -47,7 +48,6 @@ const Suscription = () => {
           fecha_vencimiento: fecha_vencimiento.toISOString(),
           estado: "Activa",
         });
-        
       } else {
         alert("❌ Error: " + data.error);
       }

@@ -2,36 +2,37 @@ import React, { useContext, useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { CartContext } from "./CartContext";
 
+const API_URL = process.env.REACT_APP_API_URL;
+
 const Header = () => {
   const { cart } = useContext(CartContext);
   const navigate = useNavigate();
 
-  // 🔹 Función para cerrar sesión
   const handleLogout = () => {
     localStorage.removeItem("token");
     alert("Cerrando sesión...");
     navigate("/");
   };
 
-const usuario = JSON.parse(localStorage.getItem("usuario"));
-const [saldo, setSaldo] = useState(null);
+  const usuario = JSON.parse(localStorage.getItem("usuario"));
+  const [saldo, setSaldo] = useState(null);
 
-useEffect(() => {
-  const fetchSaldo = async () => {
-    if (!usuario) return;
-    try {
-      const res = await fetch(`http://localhost:5000/saldo/${usuario.id_usuario}`);
-      const data = await res.json();
-      if (res.ok) {
-        setSaldo(data.saldo);
+  useEffect(() => {
+    const fetchSaldo = async () => {
+      if (!usuario) return;
+      try {
+        const res = await fetch(`${API_URL}/saldo/${usuario.id_usuario}`);
+        const data = await res.json();
+        if (res.ok) {
+          setSaldo(data.saldo);
+        }
+      } catch (err) {
+        console.error("❌ Error al obtener saldo:", err);
       }
-    } catch (err) {
-      console.error("❌ Error al obtener saldo:", err);
-    }
-  };
+    };
 
-  fetchSaldo();
-}, [usuario]);
+    fetchSaldo();
+  }, [usuario]);
 
   return (
     <header style={styles.header}>
@@ -44,13 +45,13 @@ useEffect(() => {
             <Link to="/nuestro-producto" style={styles.navLink}>Nuestro Producto</Link>
           </li>
           <li style={styles.navItem}>
-            <Link to="/subscriptions " style={styles.navLink}>Suscripciones</Link>
+            <Link to="/subscriptions" style={styles.navLink}>Suscripciones</Link>
           </li>
           <li style={styles.navItem}>
-          <Link to="/mis-suscripciones" style={styles.navLink}>Mi Suscripción</Link>
+            <Link to="/mis-suscripciones" style={styles.navLink}>Mi Suscripción</Link>
           </li>
           <li style={styles.navItem}>
-          <Link to="/mis-facturas" style={styles.navLink}>Mis Facturas</Link>
+            <Link to="/mis-facturas" style={styles.navLink}>Mis Facturas</Link>
           </li>
           <li style={styles.navItem}>
             <Link to="/cart" style={styles.navLink}>🛒 Carrito ({cart.length})</Link>
@@ -59,7 +60,6 @@ useEffect(() => {
             🧾 Saldo: ${saldo !== null ? saldo.toFixed(2) : "Cargando..."}
           </li>
         </ul>
-        {/* 🔹 Botón de Cerrar Sesión */}
         <button onClick={handleLogout} style={styles.logoutButton}>
           Cerrar Sesión
         </button>

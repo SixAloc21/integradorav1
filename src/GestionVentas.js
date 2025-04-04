@@ -2,13 +2,15 @@ import React, { useState, useEffect } from 'react';
 import DashboardLayout from './DashboardLayout';
 import moment from 'moment';
 
+const API_URL = process.env.REACT_APP_API_URL;
+
 const GestionVentas = () => {
   const [ventas, setVentas] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const fetchVentas = async () => {
     try {
-      const res = await fetch('http://localhost:5000/admin/todas-las-transacciones');
+      const res = await fetch(`${API_URL}/admin/todas-las-transacciones`);
       const data = await res.json();
       setVentas(data);
     } catch (err) {
@@ -28,9 +30,9 @@ const GestionVentas = () => {
 
   const exportarPDF = async () => {
     try {
-      const res = await fetch("http://localhost:5000/admin/reporte-ventas");
+      const res = await fetch(`${API_URL}/admin/reporte-ventas`);
       if (!res.ok) throw new Error("❌ Error al generar el PDF");
-  
+
       const blob = await res.blob();
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement("a");
@@ -45,7 +47,6 @@ const GestionVentas = () => {
       alert("Error al generar el PDF");
     }
   };
-  
 
   return (
     <DashboardLayout>

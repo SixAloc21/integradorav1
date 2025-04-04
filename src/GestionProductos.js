@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import DashboardLayout from './DashboardLayout';
 
+const API_URL = process.env.REACT_APP_API_URL;
+
 const GestionProductos = () => {
   const [productos, setProductos] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -16,7 +18,7 @@ const GestionProductos = () => {
 
   const fetchProductos = async () => {
     try {
-      const res = await fetch('http://localhost:5000/admin/productos');
+      const res = await fetch(`${API_URL}/admin/productos`);
       const data = await res.json();
       setProductos(data);
     } catch (err) {
@@ -28,7 +30,7 @@ const GestionProductos = () => {
 
   const fetchEstadisticas = async () => {
     try {
-      const res = await fetch('http://localhost:5000/admin/productos/estadisticas');
+      const res = await fetch(`${API_URL}/admin/productos/estadisticas`);
       const data = await res.json();
       setProductoTop(data.producto_top || "Sin datos");
       setStockTotal(data.stock_total);
@@ -55,8 +57,8 @@ const GestionProductos = () => {
     e.preventDefault();
     try {
       const url = editandoId
-        ? `http://localhost:5000/admin/productos/${editandoId}`
-        : 'http://localhost:5000/admin/productos';
+        ? `${API_URL}/admin/productos/${editandoId}`
+        : `${API_URL}/admin/productos`;
       const method = editandoId ? 'PUT' : 'POST';
 
       const res = await fetch(url, {
@@ -69,7 +71,7 @@ const GestionProductos = () => {
       alert(data.message);
       limpiarFormulario();
       fetchProductos();
-      fetchEstadisticas(); // actualizar estadísticas si se agrega producto
+      fetchEstadisticas();
     } catch (err) {
       console.error("❌ Error al guardar:", err);
     }
@@ -87,7 +89,7 @@ const GestionProductos = () => {
 
   const toggleEstatus = async (id) => {
     try {
-      const res = await fetch(`http://localhost:5000/admin/productos/${id}/toggle`, {
+      const res = await fetch(`${API_URL}/admin/productos/${id}/toggle`, {
         method: 'PUT',
       });
       const data = await res.json();
@@ -101,7 +103,7 @@ const GestionProductos = () => {
 
   const exportarPDF = async () => {
     try {
-      const res = await fetch('http://localhost:5000/admin/reporte-productos');
+      const res = await fetch(`${API_URL}/admin/reporte-productos`);
       if (!res.ok) throw new Error('❌ Error al generar el PDF');
 
       const blob = await res.blob();

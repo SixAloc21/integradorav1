@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import Header from './Header';
 
+const API_URL = process.env.REACT_APP_API_URL;
+
 const MisFacturas = () => {
   const usuario = JSON.parse(localStorage.getItem("usuario"));
   const [facturasProductos, setFacturasProductos] = useState([]);
@@ -11,11 +13,11 @@ const MisFacturas = () => {
 
     const fetchFacturas = async () => {
       try {
-        const res1 = await fetch(`http://localhost:5000/facturas-productos/${usuario.id_usuario}`);
+        const res1 = await fetch(`${API_URL}/facturas-productos/${usuario.id_usuario}`);
         const data1 = await res1.json();
         setFacturasProductos(data1);
 
-        const res2 = await fetch(`http://localhost:5000/facturas/${usuario.id_usuario}`);
+        const res2 = await fetch(`${API_URL}/facturas/${usuario.id_usuario}`);
         const data2 = await res2.json();
         setFacturasSuscripciones(data2);
       } catch (error) {
@@ -28,8 +30,8 @@ const MisFacturas = () => {
 
   const generarPDF = async (id_factura, tipo) => {
     const endpoint = tipo === 'producto'
-      ? `http://localhost:5000/factura-producto-pdf/${id_factura}`
-      : `http://localhost:5000/factura-suscripcion-pdf/${id_factura}`;
+      ? `${API_URL}/factura-producto-pdf/${id_factura}`
+      : `${API_URL}/factura-suscripcion-pdf/${id_factura}`;
 
     try {
       const res = await fetch(endpoint);

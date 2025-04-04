@@ -4,6 +4,8 @@ import {
 } from 'recharts';
 import DashboardLayout from "./DashboardLayout";
 
+const API_URL = process.env.REACT_APP_API_URL;
+
 const Graficas = () => {
   const [porMes, setPorMes] = useState(false);
   const [ventas, setVentas] = useState([]);
@@ -12,7 +14,7 @@ const Graficas = () => {
   useEffect(() => {
     const fetchVentas = async () => {
       try {
-        const res = await fetch(`http://localhost:5000/admin/grafica-ventas-${porMes ? "mes" : "dia"}`);
+        const res = await fetch(`${API_URL}/admin/grafica-ventas-${porMes ? "mes" : "dia"}`);
         const data = await res.json();
         setVentas(data);
       } catch (error) {
@@ -26,7 +28,7 @@ const Graficas = () => {
   useEffect(() => {
     const fetchClientes = async () => {
       try {
-        const res = await fetch(`http://localhost:5000/admin/frecuencia-clientes`);
+        const res = await fetch(`${API_URL}/admin/frecuencia-clientes`);
         const data = await res.json();
         setClientes(data);
       } catch (error) {

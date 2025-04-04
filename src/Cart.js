@@ -2,6 +2,8 @@ import React, { useContext } from "react";
 import { CartContext } from "./CartContext";
 import Header from "./Header";
 
+const API = process.env.REACT_APP_API_URL;
+
 const Cart = () => {
   const { cart, removeFromCart, clearCart } = useContext(CartContext);
 
@@ -16,7 +18,7 @@ const Cart = () => {
     if (!usuario) return alert("⚠️ Debes iniciar sesión para pagar.");
 
     try {
-      const response = await fetch("http://localhost:5000/pagar", {
+      const response = await fetch(`${API}/pagar`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -153,5 +155,3 @@ const styles = {
 };
 
 export default Cart;
-
-
