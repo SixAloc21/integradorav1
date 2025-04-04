@@ -29,11 +29,16 @@ const Login = () => {
 
       const data = await response.json();
 
+      if (response.status === 403) {
+        setError("⚠️ Ya hay una sesión activa con esta cuenta.");
+        return;
+      }
+      
       if (response.ok) {
         localStorage.setItem("token", data.token);
         localStorage.setItem("usuario", JSON.stringify(data.usuario));
         setError("");
-
+      
         if (data.usuario.nombre_rol === "Administrador") {
           navigate("/admin");
         } else {
@@ -41,11 +46,7 @@ const Login = () => {
         }
       } else {
         setError(data.error || "Error al iniciar sesión.");
-      }
-    } catch (err) {
-      console.error("🚨 Error al conectar con el servidor:", err);
-      setError("Error al conectar con el servidor.");
-    }
+      }      
   };
 
   const handleGoogleLogin = async () => {

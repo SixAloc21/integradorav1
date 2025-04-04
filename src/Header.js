@@ -8,15 +8,10 @@ const Header = () => {
   const { cart } = useContext(CartContext);
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    alert("Cerrando sesión...");
-    navigate("/");
-  };
-
   const usuario = JSON.parse(localStorage.getItem("usuario"));
   const [saldo, setSaldo] = useState(null);
 
+  // 🔄 Obtener saldo
   useEffect(() => {
     const fetchSaldo = async () => {
       if (!usuario) return;
@@ -33,6 +28,29 @@ const Header = () => {
 
     fetchSaldo();
   }, [usuario]);
+
+  // 🔐 Logout completo (actualiza is_logged_in + limpia storage)
+  const handleLogout = async () => {
+    if (!usuario) {
+      localStorage.clear();
+      navigate("/");
+      return;
+    }
+
+    try {
+      await fetch(`${API_URL}/logout`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id_usuario: usuario.id_usuario }),
+      });
+    } catch (error) {
+      console.error("❌ Error al cerrar sesión:", error);
+    }
+
+    localStorage.clear();
+    alert("👋 Sesión cerrada exitosamente.");
+    navigate("/");
+  };
 
   return (
     <header style={styles.header}>
