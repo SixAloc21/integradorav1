@@ -10,6 +10,7 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false); // <- nuevo
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -19,6 +20,8 @@ const Login = () => {
       setError("Por favor, completa todos los campos.");
       return;
     }
+
+    setLoading(true); // comenzar carga
 
     try {
       const response = await fetch(`${API}/login`, {
@@ -31,14 +34,15 @@ const Login = () => {
 
       if (response.status === 403) {
         setError("⚠️ Ya hay una sesión activa con esta cuenta.");
+        setLoading(false);
         return;
       }
-      
+
       if (response.ok) {
         localStorage.setItem("token", data.token);
         localStorage.setItem("usuario", JSON.stringify(data.usuario));
         setError("");
-      
+
         if (data.usuario.nombre_rol === "Administrador") {
           navigate("/admin");
         } else {
@@ -46,7 +50,13 @@ const Login = () => {
         }
       } else {
         setError(data.error || "Error al iniciar sesión.");
-      }      
+      }
+    } catch (err) {
+      console.error("🚨 Error al conectar con el servidor:", err);
+      setError("Error al conectar con el servidor.");
+    } finally {
+      setLoading(false); // detener carga
+    }
   };
 
   const handleGoogleLogin = async () => {
@@ -107,7 +117,9 @@ const Login = () => {
           />
         </div>
 
-        <button type="submit" style={styles.button}>Iniciar Sesión</button>
+        <button type="submit" style={styles.button} disabled={loading}>
+          {loading ? "Cargando..." : "Iniciar Sesión"}
+        </button>
       </form>
 
       <p style={styles.linkText}>
