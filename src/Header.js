@@ -31,27 +31,26 @@ const Header = () => {
 
   // 🔐 Logout completo (actualiza is_logged_in + limpia storage)
   const handleLogout = async () => {
-    if (!usuario) {
-      localStorage.clear();
-      navigate("/");
-      return;
+    const usuario = JSON.parse(localStorage.getItem("usuario"));
+  
+    if (usuario) {
+      try {
+        await fetch(`${API_URL}/logout`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id_usuario: usuario.id_usuario }),
+        });
+      } catch (err) {
+        console.error("❌ Error al cerrar sesión:", err);
+      }
     }
-
-    try {
-      await fetch(`${API_URL}/logout`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id_usuario: usuario.id_usuario }),
-      });
-    } catch (error) {
-      console.error("❌ Error al cerrar sesión:", error);
-    }
-
-    localStorage.clear();
-    alert("👋 Sesión cerrada exitosamente.");
+  
+    localStorage.removeItem("token");
+    localStorage.removeItem("usuario");
+    alert("Cerrando sesión...");
     navigate("/");
   };
-
+   
   return (
     <header style={styles.header}>
       <nav style={styles.nav}>
